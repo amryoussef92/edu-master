@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
+import Homepage from "./pages/Homepage"; // ✅ New Homepage
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import CreateAdminPage from "./pages/CreateAdminPage";
@@ -15,6 +16,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* ✅ Root Homepage */}
+        <Route path="/" element={<Homepage />} />
+
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
@@ -56,7 +60,7 @@ function App() {
         />
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
