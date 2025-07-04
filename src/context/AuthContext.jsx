@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
@@ -11,46 +11,87 @@ export const AuthProvider = ({ children }) => {
     role: null,
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // ✅ Start as true
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    const restoreSession = async () => {
+      try {
+        const decoded = jwtDecode(token);
+
+        const now = Date.now() / 1000;
+        if (decoded.exp < now) {
+          throw new Error("Token expired");
+        }
+
+        const email = decoded?.email;
+        let role = "student";
+
+        if (email === "s_admin@gmail.com") {
+          role = "super-admin";
+        } else {
+          try {
+            const adminRes = await axios.get(
+              "https://edu-master-delta.vercel.app/admin/all-user",
+              { headers: { token } }
+            );
+            if (adminRes.data.success) {
+              role = "admin";
+            }
+          } catch {
+            role = "student";
+          }
+        }
+
+        setAuth({ token, user: email, role });
+      } catch (err) {
+        console.error("❌ Failed to restore session", err);
+        localStorage.removeItem("token");
+        setAuth({ token: "", user: null, role: null });
+      } finally {
+        setLoading(false); // ✅ End loading
+      }
+    };
+
+    restoreSession();
+  }, []);
 
   const login = async (data) => {
     setLoading(true);
-    const decoded = jwtDecode(data.token);
-    const email = decoded?.email;
-
-    localStorage.setItem("token", data.token);
-
-    let role = "student"; // Default fallback
-
     try {
-      if (email === "s_admin@gmail.com") {
-        // ✅ Super Admin hardcoded
-        role = "super-admin";
-        console.log("🎯 Super Admin detected:", email);
-      } else {
-        // ✅ Try admin-only API
-        const adminRes = await axios.get(
-          "https://edu-master-delta.vercel.app/admin/all-user",
-          {
-            headers: { token: data.token },
-          }
-        );
+      const decoded = jwtDecode(data.token);
+      const email = decoded?.email;
 
-        if (adminRes.data.success) {
-          // ✅ Backend allowed access → this is an admin
-          role = "admin";
-          console.log("🎯 Admin detected:", email);
+      localStorage.setItem("token", data.token);
+
+      let role = "student";
+
+      if (email === "s_admin@gmail.com") {
+        role = "super-admin";
+      } else {
+        try {
+          const adminRes = await axios.get(
+            "https://edu-master-delta.vercel.app/admin/all-user",
+            { headers: { token: data.token } }
+          );
+          if (adminRes.data.success) {
+            role = "admin";
+          }
+        } catch {
+          role = "student";
         }
       }
+
+      setAuth({ token: data.token, user: email, role });
     } catch (err) {
-      console.error("❌ Error detecting role, fallback to student:", err);
-      role = "student"; // fallback
+      console.error("Login failed:", err);
+      localStorage.removeItem("token");
     } finally {
-      setAuth({
-        token: data.token,
-        user: email,
-        role: role,
-      });
       setLoading(false);
     }
   };

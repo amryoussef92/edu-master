@@ -1,47 +1,85 @@
-"use client"
+"use client";
 
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import { useAuth } from "./context/AuthContext"
-import { CartProvider } from "./context/CartContext"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 
-// Existing pages
-import Homepage from "./pages/Homepage"
-import LoginPage from "./pages/LoginPage"
-import SignUpPage from "./pages/SignUpPage"
-import CreateAdminPage from "./pages/CreateAdminPage"
-import AdminDashboard from "./pages/AdminDashboard"
+// Public pages
+import Homepage from "./pages/Homepage";
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
 
-// New student components
-import StudentLayout from "./components/StudentLayout"
-import Dashboard from "./pages/student/Dashboard"
-import Lessons from "./pages/student/Lessons"
-import MyLessons from "./pages/student/MyLessons"
-import Cart from "./pages/student/Cart"
-import Exams from "./pages/student/Exams"
+// Admin/super-admin pages
+import CreateAdminPage from "./pages/CreateAdminPage";
+import AdminDashboard from "./pages/AdminDashboard";
+
+// Student area
+import StudentLayout from "./components/StudentLayout";
+import Dashboard from "./pages/student/Dashboard";
+import Lessons from "./pages/student/Lessons";
+import MyLessons from "./pages/student/MyLessons";
+import Cart from "./pages/student/Cart";
+import Exams from "./pages/student/Exams";
+
+// Profile area
+import Profile from "./pages/Profile/Profile";
+import ProfileLayout from "./pages/Profile/ProfileLayout";
+import EditProfile from "./pages/Profile/EditProfile";
+import MyCourses from "./pages/Profile/MyCourses";
+import ReviewsSection from "./pages/Profile/Reviews";
+import Teachers from "./pages/Profile/Teachers";
 
 function App() {
-  const { auth, loading } = useAuth()
+  const { auth, loading } = useAuth();
 
-  if (loading) return <p>Loading...</p>
+  // ✅ Wait until auth is checked
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <CartProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public */}
           <Route path="/" element={<Homepage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+
+          {/* Super Admin */}
           <Route
             path="/super-admin"
-            element={auth.role === "super-admin" ? <CreateAdminPage /> : <Navigate to="/login" replace />}
+            element={
+              auth.role === "super-admin" ? (
+                <CreateAdminPage />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
+
+          {/* Admin */}
           <Route
             path="/admin"
-            element={auth.role === "admin" ? <AdminDashboard /> : <Navigate to="/login" replace />}
+            element={
+              auth.role === "admin" ? (
+                <AdminDashboard />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
+
+          {/* Student */}
           <Route
             path="/student"
-            element={auth.role === "student" ? <StudentLayout /> : <Navigate to="/login" replace />}
+            element={
+              auth.role === "student" ? (
+                <StudentLayout />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           >
             <Route index element={<Dashboard />} />
             <Route path="lessons" element={<Lessons />} />
@@ -49,11 +87,33 @@ function App() {
             <Route path="cart" element={<Cart />} />
             <Route path="exams" element={<Exams />} />
           </Route>
+
+          {/* Profile */}
+          <Route
+            path="/profile"
+            element={
+              auth.role === "student" ? (
+                <ProfileLayout />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          >
+            <Route index element={<Profile />} />{" "}
+            {/* Shows summary with edit button */}
+            <Route path="edit" element={<EditProfile />} />{" "}
+            {/* Shows editable form */}
+            <Route path="courses" element={<MyCourses />} />
+            <Route path="reviews" element={<ReviewsSection />} />
+            <Route path="teachers" element={<Teachers />} />
+          </Route>
+
+          {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </CartProvider>
-  )
+  );
 }
 
-export default App
+export default App;

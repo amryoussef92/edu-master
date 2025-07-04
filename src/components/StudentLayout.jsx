@@ -1,21 +1,41 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Link, useLocation, Outlet } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
-import { useCart } from "../context/CartContext"
+import { useState } from "react";
+import { Link, useLocation, Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 export default function StudentLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { auth, logout } = useAuth()
-  const { getCartCount } = useCart()
-  const location = useLocation()
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { auth, logout } = useAuth();
+  const { getCartCount } = useCart();
+  const location = useLocation();
 
   const navigation = [
-    { name: "Dashboard", href: "/student", icon: "🏠", gradient: "from-blue-500 to-purple-600" },
-    { name: "Browse Lessons", href: "/student/lessons", icon: "📚", gradient: "from-green-500 to-teal-600" },
-    { name: "My Lessons", href: "/student/my-lessons", icon: "🎓", gradient: "from-orange-500 to-red-600" },
-    { name: "Exams", href: "/student/exams", icon: "📝", gradient: "from-purple-500 to-pink-600" },
+    {
+      name: "Dashboard",
+      href: "/student",
+      icon: "🏠",
+      gradient: "from-blue-500 to-purple-600",
+    },
+    {
+      name: "Browse Lessons",
+      href: "/student/lessons",
+      icon: "📚",
+      gradient: "from-green-500 to-teal-600",
+    },
+    {
+      name: "My Lessons",
+      href: "/student/my-lessons",
+      icon: "🎓",
+      gradient: "from-orange-500 to-red-600",
+    },
+    {
+      name: "Exams",
+      href: "/student/exams",
+      icon: "📝",
+      gradient: "from-purple-500 to-pink-600",
+    },
     {
       name: "Cart",
       href: "/student/cart",
@@ -23,26 +43,46 @@ export default function StudentLayout() {
       badge: getCartCount(),
       gradient: "from-yellow-500 to-orange-600",
     },
-  ]
+  ];
 
   const isActive = (href) => {
     if (href === "/student") {
-      return location.pathname === "/student"
+      return location.pathname === "/student";
     }
-    return location.pathname.startsWith(href)
-  }
+    return location.pathname.startsWith(href);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Mobile sidebar */}
-      <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? "block" : "hidden"}`}>
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+      <div
+        className={`fixed inset-0 z-50 lg:hidden ${
+          sidebarOpen ? "block" : "hidden"
+        }`}
+      >
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        />
         <div className="fixed inset-y-0 left-0 w-72 bg-white shadow-2xl">
           <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-purple-600 to-blue-600">
             <h2 className="text-xl font-bold text-white">EduMaster</h2>
-            <button onClick={() => setSidebarOpen(false)} className="text-white hover:text-gray-200 transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="text-white hover:text-gray-200 transition-colors"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -93,7 +133,9 @@ export default function StudentLayout() {
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 hover:shadow-md"
                 }`}
               >
-                <span className="text-xl mr-4 group-hover:scale-110 transition-transform">{item.icon}</span>
+                <span className="text-xl mr-4 group-hover:scale-110 transition-transform">
+                  {item.icon}
+                </span>
                 {item.name}
                 {item.badge > 0 && (
                   <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 animate-pulse">
@@ -105,11 +147,17 @@ export default function StudentLayout() {
           </nav>
           <div className="border-t p-6 bg-gray-50">
             <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mr-3">
+              <Link
+                to="/profile"
+                className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mr-3 hover:scale-105 transition"
+              >
                 <span className="text-white text-xl">👤</span>
-              </div>
+              </Link>
+
               <div>
-                <p className="text-sm font-medium text-gray-900">{auth.user || "Student"}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {auth.user || "Student"}
+                </p>
                 <p className="text-xs text-gray-500">Premium Member</p>
               </div>
             </div>
@@ -133,8 +181,18 @@ export default function StudentLayout() {
               onClick={() => setSidebarOpen(true)}
               className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             </button>
             <h1 className="text-lg font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
@@ -150,5 +208,5 @@ export default function StudentLayout() {
         </main>
       </div>
     </div>
-  )
+  );
 }
