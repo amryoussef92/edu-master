@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -10,6 +10,23 @@ export default function StudentLayout() {
   const { auth, logout } = useAuth();
   const { getCartCount } = useCart();
   const location = useLocation();
+  const [profileImage, setProfileImage] = useState(
+    localStorage.getItem("profileImage") || null
+  );
+
+  useEffect(() => {
+    const syncProfileImage = () => {
+      setProfileImage(localStorage.getItem("profileImage"));
+    };
+
+    window.addEventListener("storage", syncProfileImage);
+    window.addEventListener("focus", syncProfileImage);
+
+    return () => {
+      window.removeEventListener("storage", syncProfileImage);
+      window.removeEventListener("focus", syncProfileImage);
+    };
+  }, []);
 
   const navigation = [
     {
@@ -149,9 +166,17 @@ export default function StudentLayout() {
             <div className="flex items-center mb-4">
               <Link
                 to="/profile"
-                className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mr-3 hover:scale-105 transition"
+                className="w-12 h-12 rounded-full flex items-center justify-center mr-3 hover:scale-105 transition overflow-hidden bg-gradient-to-r from-purple-500 to-blue-500"
               >
-                <span className="text-white text-xl">👤</span>
+                {profileImage ? (
+                  <img
+                    src={profileImage}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-white text-xl">👤</span>
+                )}
               </Link>
 
               <div>
@@ -161,6 +186,7 @@ export default function StudentLayout() {
                 <p className="text-xs text-gray-500">Premium Member</p>
               </div>
             </div>
+
             <button
               onClick={logout}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
