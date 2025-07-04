@@ -27,7 +27,7 @@ export default function LoginPage() {
     else if (auth.role === "admin") navigate("/admin");
     else if (auth.role === "student") navigate("/student");
   }, [auth.role, navigate]);
-
+console.log(auth)
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Left illustration */}
