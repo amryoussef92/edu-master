@@ -11,6 +11,7 @@ import SignUpPage from "./pages/SignUpPage";
 
 // Admin/super-admin pages
 import CreateAdminPage from "./pages/CreateAdminPage";
+import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 
 // Student area
@@ -63,12 +64,19 @@ function App() {
             path="/admin"
             element={
               auth.role === "admin" ? (
-                <AdminDashboard />
+                <AdminLayout />
               ) : (
                 <Navigate to="/login" replace />
               )
             }
-          />
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<div className="p-6"><h2 className="text-2xl font-bold">Users Management</h2><p>Coming soon...</p></div>} />
+            <Route path="lessons" element={<div className="p-6"><h2 className="text-2xl font-bold">Lessons Management</h2><p>Coming soon...</p></div>} />
+            <Route path="exams" element={<div className="p-6"><h2 className="text-2xl font-bold">Exams Management</h2><p>Coming soon...</p></div>} />
+            <Route path="revenue" element={<div className="p-6"><h2 className="text-2xl font-bold">Revenue Analytics</h2><p>Coming soon...</p></div>} />
+            <Route path="settings" element={<div className="p-6"><h2 className="text-2xl font-bold">Admin Settings</h2><p>Coming soon...</p></div>} />
+          </Route>
 
           {/* Student */}
           <Route
