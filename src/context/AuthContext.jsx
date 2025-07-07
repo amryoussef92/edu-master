@@ -1,111 +1,110 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import axios from "axios";
+"use client"
 
-const AuthContext = createContext();
+import { createContext, useContext, useEffect, useState } from "react"
+import { jwtDecode } from "jwt-decode"
+import axios from "axios"
+
+const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
-    token: localStorage.getItem("token") || "",
+    token: "",
     user: null,
     role: null,
-  });
+  })
 
-  const [loading, setLoading] = useState(true); // ✅ Start as true
+  const [loading, setLoading] = useState(true) // ✅ Start as true
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")
     if (!token) {
-      setLoading(false);
-      return;
+      setLoading(false)
+      return
     }
 
     const restoreSession = async () => {
       try {
-        const decoded = jwtDecode(token);
+        const decoded = jwtDecode(token)
 
-        const now = Date.now() / 1000;
+        const now = Date.now() / 1000
         if (decoded.exp < now) {
-          throw new Error("Token expired");
+          throw new Error("Token expired")
         }
 
-        const email = decoded?.email;
-        let role = "student";
+        const email = decoded?.email
+        let role = "student"
 
         if (email === "s_admin@gmail.com") {
-          role = "super-admin";
+          role = "super-admin"
         } else {
           try {
-            const adminRes = await axios.get(
-              "https://edu-master-delta.vercel.app/admin/all-user",
-              { headers: { token } }
-            );
+            const adminRes = await axios.get("https://edu-master-delta.vercel.app/admin/all-user", {
+              headers: { token },
+            })
             if (adminRes.data.success) {
-              role = "admin";
+              role = "admin"
             }
           } catch {
-            role = "student";
+            role = "student"
           }
         }
 
-        setAuth({ token, user: email, role });
+        setAuth({ token, user: email, role })
+        console.log("✅ Session restored:", { email, role }) // Debug log
       } catch (err) {
-        console.error("❌ Failed to restore session", err);
-        localStorage.removeItem("token");
-        setAuth({ token: "", user: null, role: null });
+        console.error("❌ Failed to restore session", err)
+        localStorage.removeItem("token")
+        setAuth({ token: "", user: null, role: null })
       } finally {
-        setLoading(false); // ✅ End loading
+        setLoading(false) // ✅ End loading
       }
-    };
+    }
 
-    restoreSession();
-  }, []);
+    restoreSession()
+  }, [])
 
   const login = async (data) => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const decoded = jwtDecode(data.token);
-      const email = decoded?.email;
+      const decoded = jwtDecode(data.token)
+      const email = decoded?.email
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.token)
 
-      let role = "student";
+      let role = "student"
 
       if (email === "s_admin@gmail.com") {
-        role = "super-admin";
+        role = "super-admin"
       } else {
         try {
-          const adminRes = await axios.get(
-            "https://edu-master-delta.vercel.app/admin/all-user",
-            { headers: { token: data.token } }
-          );
+          const adminRes = await axios.get("https://edu-master-delta.vercel.app/admin/all-user", {
+            headers: { token: data.token },
+          })
           if (adminRes.data.success) {
-            role = "admin";
+            role = "admin"
           }
         } catch {
-          role = "student";
+          role = "student"
         }
       }
 
-      setAuth({ token: data.token, user: email, role });
+      setAuth({ token: data.token, user: email, role })
+      console.log("✅ Login successful:", { email, role }) // Debug log
     } catch (err) {
-      console.error("Login failed:", err);
-      localStorage.removeItem("token");
+      console.error("❌ Login failed:", err)
+      localStorage.removeItem("token")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const logout = () => {
-    localStorage.removeItem("token");
-    setAuth({ token: "", user: null, role: null });
-  };
+    localStorage.removeItem("token")
+    setAuth({ token: "", user: null, role: null })
+    console.log("✅ Logged out") // Debug log
+  }
 
-  return (
-    <AuthContext.Provider value={{ auth, login, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  return <AuthContext.Provider value={{ auth, login, logout, loading }}>{children}</AuthContext.Provider>
+}
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext)

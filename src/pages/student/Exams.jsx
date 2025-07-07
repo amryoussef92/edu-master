@@ -2,21 +2,16 @@
 
 import { useState } from "react"
 import { useExams, useStartExam } from "../../hooks/useStudent"
+import { useNavigate } from "react-router-dom"
 
 export default function Exams() {
   const [selectedTab, setSelectedTab] = useState("available")
   const { data: exams, isLoading, error } = useExams()
   const { mutate: startExam, isPending } = useStartExam()
+  const navigate = useNavigate()
 
   const handleStartExam = (examId) => {
-    startExam(examId, {
-      onSuccess: (data) => {
-        alert("🎯 Exam started! This would navigate to the exam interface.")
-      },
-      onError: (error) => {
-        alert("❌ Failed to start exam: " + error.message)
-      },
-    })
+    navigate(`/student/exam/${examId}`)
   }
 
   if (isLoading) {

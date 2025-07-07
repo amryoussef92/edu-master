@@ -1,7 +1,11 @@
+"use client"
+
 import { usePurchasedLessons } from "../../hooks/useStudent"
+import { useNavigate } from "react-router-dom"
 
 export default function MyLessons() {
   const { data: lessons, isLoading, error } = usePurchasedLessons()
+  const navigate = useNavigate()
 
   if (isLoading) {
     return (
@@ -35,13 +39,13 @@ export default function MyLessons() {
           </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-4">No lessons purchased yet</h3>
           <p className="text-gray-500 mb-8 text-lg">Browse our lesson catalog and start learning today.</p>
-          <a
-            href="/student/lessons"
+          <button
+            onClick={() => navigate("/student/lessons")}
             className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl hover:from-orange-700 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg"
           >
             <span className="mr-2">📚</span>
             Browse Lessons
-          </a>
+          </button>
         </div>
       </div>
     )
@@ -63,7 +67,10 @@ export default function MyLessons() {
           >
             <div className="aspect-video bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center relative">
               <span className="text-white text-4xl">🎥</span>
-              <button className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => navigate(`/student/lesson/${lesson._id}`)}
+                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity"
+              >
                 <div className="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
                   <span className="text-2xl ml-1">▶️</span>
                 </div>
@@ -97,7 +104,10 @@ export default function MyLessons() {
               </div>
 
               <div className="flex space-x-3">
-                <button className="flex-1 flex items-center justify-center px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl text-sm font-medium hover:from-orange-700 hover:to-red-700 transition-all transform hover:scale-105">
+                <button
+                  onClick={() => navigate(`/student/lesson/${lesson._id}`)}
+                  className="flex-1 flex items-center justify-center px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl text-sm font-medium hover:from-orange-700 hover:to-red-700 transition-all transform hover:scale-105"
+                >
                   <span className="mr-2">▶️</span>
                   Watch
                 </button>

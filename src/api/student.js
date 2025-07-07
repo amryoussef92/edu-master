@@ -53,7 +53,15 @@ export const examAPI = {
   },
 
   submit: async (examId, answers) => {
-    return handleRequest(axios.post(`${API_BASE}/studentExam/submit/${examId}`, { answers }, getAuthHeaders()))
+    // ✅ Ensure answers have the correct format
+    const formattedAnswers = answers.map((answer) => ({
+      questionId: answer.questionId,
+      selectedAnswer: answer.selectedAnswer, // Make sure this is selectedAnswer, not selectedOption
+    }))
+
+    return handleRequest(
+      axios.post(`${API_BASE}/studentExam/submit/${examId}`, { answers: formattedAnswers }, getAuthHeaders()),
+    )
   },
 
   getScore: async (examId) => {
