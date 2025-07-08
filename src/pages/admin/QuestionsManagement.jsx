@@ -24,7 +24,7 @@ export default function QuestionsManagement() {
 
   const [questionForm, setQuestionForm] = useState({
     text: "",
-    type: "multiple_choice",
+    type: "multiple-choice", // Fixed: Use hyphen instead of underscore
     options: ["", "", "", ""],
     correctAnswer: "",
     exam: "",
@@ -52,7 +52,7 @@ export default function QuestionsManagement() {
       alert("Please provide a correct answer")
       return
     }
-    if (questionForm.type === "multiple_choice") {
+    if (questionForm.type === "multiple-choice") {
       const validOptions = questionForm.options.filter((opt) => opt.trim())
       if (validOptions.length < 2) {
         alert("Please provide at least 2 options for multiple choice questions")
@@ -67,9 +67,16 @@ export default function QuestionsManagement() {
     console.log("📝 Creating question with data:", questionForm)
 
     const formData = {
-      ...questionForm,
-      options: questionForm.type === "multiple_choice" ? questionForm.options.filter((opt) => opt.trim()) : [],
+      text: questionForm.text,
+      type: questionForm.type,
+      correctAnswer: questionForm.correctAnswer,
+      exam: questionForm.exam || null,
       points: Number.parseInt(questionForm.points) || 1,
+    }
+
+    // Only include options for multiple-choice questions
+    if (questionForm.type === "multiple-choice") {
+      formData.options = questionForm.options.filter((opt) => opt.trim())
     }
 
     createQuestion(formData, {
@@ -96,9 +103,16 @@ export default function QuestionsManagement() {
     console.log("📝 Updating question with data:", questionForm)
 
     const formData = {
-      ...questionForm,
-      options: questionForm.type === "multiple_choice" ? questionForm.options.filter((opt) => opt.trim()) : [],
+      text: questionForm.text,
+      type: questionForm.type,
+      correctAnswer: questionForm.correctAnswer,
+      exam: questionForm.exam || null,
       points: Number.parseInt(questionForm.points) || 1,
+    }
+
+    // Only include options for multiple-choice questions
+    if (questionForm.type === "multiple-choice") {
+      formData.options = questionForm.options.filter((opt) => opt.trim())
     }
 
     updateQuestion(
@@ -124,7 +138,7 @@ export default function QuestionsManagement() {
     setEditingQuestion(question)
     setQuestionForm({
       text: question.question || question.text || "",
-      type: question.type || "multiple_choice",
+      type: question.type || "multiple-choice",
       options:
         question.options && question.options.length > 0
           ? [...question.options, "", "", "", ""].slice(0, 4)
@@ -138,7 +152,7 @@ export default function QuestionsManagement() {
   const resetForm = () => {
     setQuestionForm({
       text: "",
-      type: "multiple_choice",
+      type: "multiple-choice",
       options: ["", "", "", ""],
       correctAnswer: "",
       exam: "",
@@ -241,9 +255,9 @@ export default function QuestionsManagement() {
             className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
           >
             <option value="">All Types</option>
-            <option value="multiple_choice">Multiple Choice</option>
-            <option value="true_false">True/False</option>
-            <option value="short_answer">Short Answer</option>
+            <option value="multiple-choice">Multiple Choice</option>
+            <option value="true-false">True/False</option>
+            <option value="short-answer">Short Answer</option>
           </select>
 
           <button
@@ -268,20 +282,20 @@ export default function QuestionsManagement() {
                 <div className="flex items-center space-x-3 mb-2">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      question.type === "multiple_choice"
+                      question.type === "multiple-choice"
                         ? "bg-blue-100 text-blue-800"
-                        : question.type === "true_false"
+                        : question.type === "true-false"
                           ? "bg-green-100 text-green-800"
                           : "bg-purple-100 text-purple-800"
                     }`}
                   >
-                    {question.type?.replace("_", " ").toUpperCase()}
+                    {question.type?.replace("-", " ").toUpperCase()}
                   </span>
                   <span className="text-sm text-gray-500">{question.points || 1} points</span>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-3">{question.question || question.text}</h3>
 
-                {question.type === "multiple_choice" && question.options && (
+                {question.type === "multiple-choice" && question.options && (
                   <div className="space-y-2 mb-3">
                     {question.options.map((option, index) => (
                       <div
@@ -302,7 +316,7 @@ export default function QuestionsManagement() {
                   </div>
                 )}
 
-                {question.type === "true_false" && (
+                {question.type === "true-false" && (
                   <div className="mb-3">
                     <span className="text-sm text-gray-600">
                       Correct Answer: <span className="font-medium">{question.correctAnswer}</span>
@@ -310,7 +324,7 @@ export default function QuestionsManagement() {
                   </div>
                 )}
 
-                {question.type === "short_answer" && (
+                {question.type === "short-answer" && (
                   <div className="mb-3">
                     <span className="text-sm text-gray-600">
                       Correct Answer: <span className="font-medium">{question.correctAnswer}</span>
@@ -377,14 +391,14 @@ export default function QuestionsManagement() {
                         ...questionForm,
                         type: e.target.value,
                         correctAnswer: "", // Reset correct answer when type changes
-                        options: e.target.value === "multiple_choice" ? ["", "", "", ""] : [],
+                        options: e.target.value === "multiple-choice" ? ["", "", "", ""] : [],
                       })
                     }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                   >
-                    <option value="multiple_choice">Multiple Choice</option>
-                    <option value="true_false">True/False</option>
-                    <option value="short_answer">Short Answer</option>
+                    <option value="multiple-choice">Multiple Choice</option>
+                    <option value="true-false">True/False</option>
+                    <option value="short-answer">Short Answer</option>
                   </select>
                 </div>
 
@@ -429,7 +443,7 @@ export default function QuestionsManagement() {
                 />
               </div>
 
-              {questionForm.type === "multiple_choice" && (
+              {questionForm.type === "multiple-choice" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Answer Options *</label>
                   <div className="space-y-3">
@@ -460,7 +474,7 @@ export default function QuestionsManagement() {
                 </div>
               )}
 
-              {questionForm.type === "true_false" && (
+              {questionForm.type === "true-false" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Correct Answer *</label>
                   <div className="flex space-x-4">
@@ -490,7 +504,7 @@ export default function QuestionsManagement() {
                 </div>
               )}
 
-              {questionForm.type === "short_answer" && (
+              {questionForm.type === "short-answer" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Correct Answer *</label>
                   <input

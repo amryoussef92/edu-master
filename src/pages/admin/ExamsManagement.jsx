@@ -19,6 +19,8 @@ export default function ExamsManagement() {
     description: "",
     classLevel: "",
     duration: "",
+    startDate: "",
+    endDate: "",
     questions: [],
   })
 
@@ -37,12 +39,32 @@ export default function ExamsManagement() {
       alert("Please enter an exam title")
       return
     }
+    if (!examForm.description.trim()) {
+      alert("Please enter a description")
+      return
+    }
+    if (examForm.description.trim().length < 10) {
+      alert("Description must be at least 10 characters long")
+      return
+    }
     if (!examForm.classLevel) {
       alert("Please select a class level")
       return
     }
     if (!examForm.duration || Number(examForm.duration) <= 0) {
       alert("Please enter a valid duration")
+      return
+    }
+    if (!examForm.startDate) {
+      alert("Please select a start date")
+      return
+    }
+    if (!examForm.endDate) {
+      alert("Please select an end date")
+      return
+    }
+    if (new Date(examForm.startDate) >= new Date(examForm.endDate)) {
+      alert("End date must be after start date")
       return
     }
 
@@ -69,12 +91,32 @@ export default function ExamsManagement() {
       alert("Please enter an exam title")
       return
     }
+    if (!examForm.description.trim()) {
+      alert("Please enter a description")
+      return
+    }
+    if (examForm.description.trim().length < 10) {
+      alert("Description must be at least 10 characters long")
+      return
+    }
     if (!examForm.classLevel) {
       alert("Please select a class level")
       return
     }
     if (!examForm.duration || Number(examForm.duration) <= 0) {
       alert("Please enter a valid duration")
+      return
+    }
+    if (!examForm.startDate) {
+      alert("Please select a start date")
+      return
+    }
+    if (!examForm.endDate) {
+      alert("Please select an end date")
+      return
+    }
+    if (new Date(examForm.startDate) >= new Date(examForm.endDate)) {
+      alert("End date must be after start date")
       return
     }
 
@@ -106,11 +148,21 @@ export default function ExamsManagement() {
   const handleEditExam = (exam) => {
     console.log("✏️ Editing exam:", exam)
     setEditingExam(exam)
+
+    // Format dates for input fields (convert to YYYY-MM-DD format)
+    const formatDateForInput = (dateString) => {
+      if (!dateString) return ""
+      const date = new Date(dateString)
+      return date.toISOString().split("T")[0]
+    }
+
     setExamForm({
       title: exam.title || "",
       description: exam.description || "",
       classLevel: exam.classLevel || "",
       duration: exam.duration?.toString() || "",
+      startDate: formatDateForInput(exam.startDate),
+      endDate: formatDateForInput(exam.endDate),
       questions: exam.questions || [],
     })
   }
@@ -121,8 +173,16 @@ export default function ExamsManagement() {
       description: "",
       classLevel: "",
       duration: "",
+      startDate: "",
+      endDate: "",
       questions: [],
     })
+  }
+
+  // Helper function to format date for display
+  const formatDateForDisplay = (dateString) => {
+    if (!dateString) return "Not set"
+    return new Date(dateString).toLocaleDateString()
   }
 
   if (isLoading) {
@@ -200,12 +260,12 @@ export default function ExamsManagement() {
             onChange={(e) => setFilterClass(e.target.value)}
             className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
           >
-             <option value="">Select Class</option>
-                    <option value="Grade 1 Secondary">Class 1</option>
-                    <option value="Grade 2 Secondary">Class 2</option>
-                    <option value="Grade 3 Secondary">Class 3</option>
-                    <option value="Grade 4 Secondary">Class 4</option>
-                    <option value="Grade 5 Secondary">Class 5</option>
+            <option value="">Select Class</option>
+            <option value="Grade 1 Secondary">Class 1</option>
+            <option value="Grade 2 Secondary">Class 2</option>
+            <option value="Grade 3 Secondary">Class 3</option>
+            <option value="Grade 4 Secondary">Class 4</option>
+            <option value="Grade 5 Secondary">Class 5</option>
           </select>
 
           <button
@@ -231,14 +291,25 @@ export default function ExamsManagement() {
               </div>
 
               <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{exam.title}</h3>
-
               <p className="text-gray-600 text-sm mb-4 line-clamp-3">{exam.description}</p>
 
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-gray-500">{exam.questions?.length || 0} questions</span>
-                <span className="text-sm font-medium text-green-600">
-                  {exam.isActive !== false ? "Active" : "Inactive"}
-                </span>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Questions:</span>
+                  <span className="font-medium">{exam.questions?.length || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Start Date:</span>
+                  <span className="font-medium">{formatDateForDisplay(exam.startDate)}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">End Date:</span>
+                  <span className="font-medium">{formatDateForDisplay(exam.endDate)}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Status:</span>
+                  <span className="font-medium text-green-600">{exam.isActive !== false ? "Active" : "Inactive"}</span>
+                </div>
               </div>
 
               <div className="flex space-x-2">
@@ -280,7 +351,7 @@ export default function ExamsManagement() {
       {/* Create/Edit Modal */}
       {(showCreateModal || editingExam) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b">
               <h3 className="text-xl font-bold text-gray-900">{editingExam ? "Edit Exam" : "Create New Exam"}</h3>
             </div>
@@ -307,7 +378,7 @@ export default function ExamsManagement() {
                     onChange={(e) => setExamForm({ ...examForm, classLevel: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
                   >
-                     <option value="">Select Class</option>
+                    <option value="">Select Class</option>
                     <option value="Grade 1 Secondary">Class 1</option>
                     <option value="Grade 2 Secondary">Class 2</option>
                     <option value="Grade 3 Secondary">Class 3</option>
@@ -316,7 +387,7 @@ export default function ExamsManagement() {
                   </select>
                 </div>
 
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Duration (minutes) *</label>
                   <input
                     type="number"
@@ -328,17 +399,44 @@ export default function ExamsManagement() {
                     placeholder="60"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
+                  <input
+                    type="date"
+                    required
+                    value={examForm.startDate}
+                    onChange={(e) => setExamForm({ ...examForm, startDate: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">End Date *</label>
+                  <input
+                    type="date"
+                    required
+                    value={examForm.endDate}
+                    onChange={(e) => setExamForm({ ...examForm, endDate: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description * <span className="text-xs text-gray-500">(minimum 10 characters)</span>
+                </label>
                 <textarea
+                  required
                   rows={4}
+                  minLength={10}
                   value={examForm.description}
                   onChange={(e) => setExamForm({ ...examForm, description: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Describe the exam content and objectives..."
+                  placeholder="Describe the exam content and objectives... (minimum 10 characters)"
                 />
+                <div className="text-xs text-gray-500 mt-1">{examForm.description.length}/10 characters minimum</div>
               </div>
 
               <div className="bg-blue-50 p-4 rounded-xl">

@@ -19,12 +19,8 @@ export default function LessonsManagement() {
     title: "",
     description: "",
     classLevel: "",
-    subject: "",
+    video: "",
     price: "",
-    duration: "",
-    videoUrl: "",
-    thumbnailUrl: "",
-    isPaid: true,
     scheduledDate: "",
   })
 
@@ -48,13 +44,29 @@ export default function LessonsManagement() {
       alert("Please select a class level")
       return
     }
+    if (!lessonForm.video.trim()) {
+      alert("Please provide a video URL")
+      return
+    }
+
+    // Validate scheduled date if provided
+    if (lessonForm.scheduledDate) {
+      const scheduledDate = new Date(lessonForm.scheduledDate)
+      const now = new Date()
+      if (scheduledDate <= now) {
+        alert("Scheduled date must be in the future")
+        return
+      }
+    }
 
     console.log("📚 Creating lesson with data:", lessonForm)
 
     const formData = {
-      ...lessonForm,
+      title: lessonForm.title,
+      description: lessonForm.description,
+      classLevel: lessonForm.classLevel,
+      video: lessonForm.video,
       price: Number(lessonForm.price) || 0,
-      duration: Number(lessonForm.duration) || 0,
       scheduledDate: lessonForm.scheduledDate || null,
     }
 
@@ -78,13 +90,29 @@ export default function LessonsManagement() {
       alert("Please select a class level")
       return
     }
+    if (!lessonForm.video.trim()) {
+      alert("Please provide a video URL")
+      return
+    }
+
+    // Validate scheduled date if provided
+    if (lessonForm.scheduledDate) {
+      const scheduledDate = new Date(lessonForm.scheduledDate)
+      const now = new Date()
+      if (scheduledDate <= now) {
+        alert("Scheduled date must be in the future")
+        return
+      }
+    }
 
     console.log("📚 Updating lesson with data:", lessonForm)
 
     const formData = {
-      ...lessonForm,
+      title: lessonForm.title,
+      description: lessonForm.description,
+      classLevel: lessonForm.classLevel,
+      video: lessonForm.video,
       price: Number(lessonForm.price) || 0,
-      duration: Number(lessonForm.duration) || 0,
       scheduledDate: lessonForm.scheduledDate || null,
     }
 
@@ -109,17 +137,21 @@ export default function LessonsManagement() {
   const handleEditLesson = (lesson) => {
     console.log("✏️ Editing lesson:", lesson)
     setEditingLesson(lesson)
+
+    // Format date for input field
+    const formatDateForInput = (dateString) => {
+      if (!dateString) return ""
+      const date = new Date(dateString)
+      return date.toISOString().split("T")[0]
+    }
+
     setLessonForm({
       title: lesson.title || "",
       description: lesson.description || "",
       classLevel: lesson.classLevel || "",
-      subject: lesson.subject || "",
+      video: lesson.video || lesson.videoUrl || "",
       price: lesson.price?.toString() || "",
-      duration: lesson.duration?.toString() || "",
-      videoUrl: lesson.videoUrl || "",
-      thumbnailUrl: lesson.thumbnailUrl || "",
-      isPaid: lesson.isPaid !== false,
-      scheduledDate: lesson.scheduledDate ? lesson.scheduledDate.split("T")[0] : "",
+      scheduledDate: formatDateForInput(lesson.scheduledDate),
     })
   }
 
@@ -128,14 +160,17 @@ export default function LessonsManagement() {
       title: "",
       description: "",
       classLevel: "",
-      subject: "",
+      video: "",
       price: "",
-      duration: "",
-      videoUrl: "",
-      thumbnailUrl: "",
-      isPaid: true,
       scheduledDate: "",
     })
+  }
+
+  // Helper function to get minimum date (tomorrow)
+  const getMinDate = () => {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    return tomorrow.toISOString().split("T")[0]
   }
 
   if (isLoading) {
@@ -213,13 +248,12 @@ export default function LessonsManagement() {
             onChange={(e) => setFilterClass(e.target.value)}
             className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           >
-            <option value="">All Classes</option>
-            <option value="JSS1">JSS 1</option>
-            <option value="JSS2">JSS 2</option>
-            <option value="JSS3">JSS 3</option>
-            <option value="SS1">SS 1</option>
-            <option value="SS2">SS 2</option>
-            <option value="SS3">SS 3</option>
+            <option value="">Select Class</option>
+            <option value="Grade 1 Secondary">Class 1</option>
+            <option value="Grade 2 Secondary">Class 2</option>
+            <option value="Grade 3 Secondary">Class 3</option>
+            <option value="Grade 4 Secondary">Class 4</option>
+            <option value="Grade 5 Secondary">Class 5</option>
           </select>
 
           <input
@@ -257,12 +291,8 @@ export default function LessonsManagement() {
                 className="w-full h-48 object-cover"
               />
               <div className="absolute top-4 right-4">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    lesson.isPaid ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
-                  }`}
-                >
-                  {lesson.isPaid ? `₦${lesson.price}` : "Free"}
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  ₦{lesson.price || 0}
                 </span>
               </div>
             </div>
@@ -272,13 +302,11 @@ export default function LessonsManagement() {
                 <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
                   {lesson.classLevel}
                 </span>
-                <span className="text-xs text-gray-500">{lesson.duration} mins</span>
+                {lesson.duration && <span className="text-xs text-gray-500">{lesson.duration} mins</span>}
               </div>
 
               <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{lesson.title}</h3>
-
               {lesson.subject && <p className="text-sm text-blue-600 font-medium mb-2">{lesson.subject}</p>}
-
               <p className="text-gray-600 text-sm mb-4 line-clamp-3">{lesson.description}</p>
 
               {lesson.scheduledDate && (
@@ -326,7 +354,7 @@ export default function LessonsManagement() {
       {/* Create/Edit Modal */}
       {(showCreateModal || editingLesson) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b">
               <h3 className="text-xl font-bold text-gray-900">{editingLesson ? "Edit Lesson" : "Create New Lesson"}</h3>
             </div>
@@ -353,37 +381,13 @@ export default function LessonsManagement() {
                     onChange={(e) => setLessonForm({ ...lessonForm, classLevel: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Select Class Level</option>
-                    <option value="JSS1">JSS 1</option>
-                    <option value="JSS2">JSS 2</option>
-                    <option value="JSS3">JSS 3</option>
-                    <option value="SS1">SS 1</option>
-                    <option value="SS2">SS 2</option>
-                    <option value="SS3">SS 3</option>
+                    <option value="">Select Class</option>
+                    <option value="Grade 1 Secondary">Class 1</option>
+                    <option value="Grade 2 Secondary">Class 2</option>
+                    <option value="Grade 3 Secondary">Class 3</option>
+                    <option value="Grade 4 Secondary">Class 4</option>
+                    <option value="Grade 5 Secondary">Class 5</option>
                   </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                  <input
-                    type="text"
-                    value={lessonForm.subject}
-                    onChange={(e) => setLessonForm({ ...lessonForm, subject: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., Mathematics, English, Physics"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={lessonForm.duration}
-                    onChange={(e) => setLessonForm({ ...lessonForm, duration: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="60"
-                  />
                 </div>
 
                 <div>
@@ -400,9 +404,12 @@ export default function LessonsManagement() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Scheduled Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Scheduled Date <span className="text-xs text-gray-500">(optional, must be future date)</span>
+                  </label>
                   <input
                     type="date"
+                    min={getMinDate()}
                     value={lessonForm.scheduledDate}
                     onChange={(e) => setLessonForm({ ...lessonForm, scheduledDate: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -422,38 +429,25 @@ export default function LessonsManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Video URL</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Video URL *</label>
                 <input
                   type="url"
-                  value={lessonForm.videoUrl}
-                  onChange={(e) => setLessonForm({ ...lessonForm, videoUrl: e.target.value })}
+                  required
+                  value={lessonForm.video}
+                  onChange={(e) => setLessonForm({ ...lessonForm, video: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="https://example.com/video.mp4"
                 />
+                <p className="text-xs text-gray-500 mt-1">Provide a direct link to the lesson video</p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Thumbnail URL</label>
-                <input
-                  type="url"
-                  value={lessonForm.thumbnailUrl}
-                  onChange={(e) => setLessonForm({ ...lessonForm, thumbnailUrl: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://example.com/thumbnail.jpg"
-                />
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="isPaid"
-                  checked={lessonForm.isPaid}
-                  onChange={(e) => setLessonForm({ ...lessonForm, isPaid: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                />
-                <label htmlFor="isPaid" className="ml-2 text-sm font-medium text-gray-700">
-                  This is a paid lesson
-                </label>
+              <div className="bg-yellow-50 p-4 rounded-xl">
+                <h4 className="font-medium text-yellow-900 mb-2">📝 API Requirements</h4>
+                <ul className="text-sm text-yellow-700 space-y-1">
+                  <li>• Video URL is required</li>
+                  <li>• Scheduled date must be in the future (if provided)</li>
+                  <li>• Only title, description, classLevel, video, price, and scheduledDate are allowed</li>
+                </ul>
               </div>
 
               <div className="flex space-x-4 pt-4">
