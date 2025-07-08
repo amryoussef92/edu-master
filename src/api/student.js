@@ -14,6 +14,7 @@ const getAuthHeaders = () => ({
 const handleRequest = async (request) => {
   try {
     const response = await request
+    console.log("API Response:", response.data) // Debug log
     return response.data
   } catch (error) {
     console.error("API Error:", error.response?.data || error.message)
@@ -24,13 +25,41 @@ const handleRequest = async (request) => {
 // Lessons API
 export const lessonAPI = {
   getAll: async (filters = {}) => {
+    console.log("Fetching lessons with filters:", filters)
+
     const params = new URLSearchParams()
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        params.append(key, value)
+
+    // Handle search filter
+    if (filters.search && filters.search.trim()) {
+      params.append("search", filters.search.trim())
+    }
+
+    // Handle classLevel filter - convert to match API format
+    if (filters.classLevel && filters.classLevel.trim()) {
+      // Convert "1" to "Grade 1 Secondary" format to match admin data
+      const classLevelMap = {
+        1: "Grade 1 Secondary",
+        2: "Grade 2 Secondary",
+        3: "Grade 3 Secondary",
+        4: "Grade 4 Secondary",
+        5: "Grade 5 Secondary",
       }
-    })
-    return handleRequest(axios.get(`${API_BASE}/lesson?${params.toString()}`, getAuthHeaders()))
+      const mappedClassLevel = classLevelMap[filters.classLevel] || filters.classLevel
+      params.append("classLevel", mappedClassLevel)
+    }
+
+    // Handle isPaid filter
+    if (filters.isPaid && filters.isPaid !== "") {
+      // Convert string to boolean for API
+      const isPaidValue = filters.isPaid === "true"
+      params.append("isPaid", isPaidValue)
+    }
+
+    const queryString = params.toString()
+    const url = queryString ? `${API_BASE}/lesson?${queryString}` : `${API_BASE}/lesson`
+
+    console.log("Final API URL:", url)
+    return handleRequest(axios.get(url, getAuthHeaders()))
   },
 
   getPurchased: async () => {

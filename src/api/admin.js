@@ -133,27 +133,13 @@ export const adminAPI = {
       throw new Error("Video is required")
     }
 
-    // Validate scheduled date is in the future
-    if (lessonData.scheduledDate) {
-      const scheduledDate = new Date(lessonData.scheduledDate)
-      const now = new Date()
-      if (scheduledDate <= now) {
-        throw new Error("Scheduled date must be in the future")
-      }
-    }
-
-    // Build payload with only allowed fields
+    // Build payload with only allowed fields (removed scheduledDate)
     const payload = {
       title: lessonData.title.trim(),
       description: lessonData.description || "",
       classLevel: lessonData.classLevel,
       video: lessonData.video, // Required field
       price: Number(lessonData.price) || 0,
-    }
-
-    // Only add scheduledDate if it's provided and in the future
-    if (lessonData.scheduledDate) {
-      payload.scheduledDate = lessonData.scheduledDate
     }
 
     console.log("Final lesson payload:", payload)
@@ -175,27 +161,13 @@ export const adminAPI = {
       throw new Error("Video is required")
     }
 
-    // Validate scheduled date is in the future
-    if (lessonData.scheduledDate) {
-      const scheduledDate = new Date(lessonData.scheduledDate)
-      const now = new Date()
-      if (scheduledDate <= now) {
-        throw new Error("Scheduled date must be in the future")
-      }
-    }
-
-    // Build payload with only allowed fields
+    // Build payload with only allowed fields (removed scheduledDate)
     const payload = {
       title: lessonData.title.trim(),
       description: lessonData.description || "",
       classLevel: lessonData.classLevel,
       video: lessonData.video, // Required field
       price: Number(lessonData.price) || 0,
-    }
-
-    // Only add scheduledDate if it's provided and in the future
-    if (lessonData.scheduledDate) {
-      payload.scheduledDate = lessonData.scheduledDate
     }
 
     console.log("Final lesson update payload:", payload)
@@ -406,30 +378,36 @@ export const adminAPI = {
 
   // Payment Management (Mock for now)
   getPendingPayments: async () => {
+    // In a real app, this would fetch from your backend
+    // For now, we'll return mock data that matches the cart context structure
+    const mockPayments = [
+      {
+        _id: "payment1",
+        studentName: "John Doe",
+        studentEmail: "john@example.com",
+        lessonTitle: "Introduction to Mathematics",
+        amount: 29.99,
+        paymentStatus: "pending",
+        paymentMethod: "Credit Card",
+        purchaseDate: new Date().toISOString(),
+        paymentId: "payment_123456789",
+      },
+      {
+        _id: "payment2",
+        studentName: "Jane Smith",
+        studentEmail: "jane@example.com",
+        lessonTitle: "Basic Science Concepts",
+        amount: 19.99,
+        paymentStatus: "pending",
+        paymentMethod: "PayPal",
+        purchaseDate: new Date(Date.now() - 86400000).toISOString(),
+        paymentId: "payment_987654321",
+      },
+    ]
+
     return {
       success: true,
-      data: [
-        {
-          _id: "payment1",
-          studentName: "John Doe",
-          studentEmail: "john@example.com",
-          lessonTitle: "Introduction to Mathematics",
-          amount: 29.99,
-          status: "pending",
-          createdAt: new Date().toISOString(),
-          paymentMethod: "Credit Card",
-        },
-        {
-          _id: "payment2",
-          studentName: "Jane Smith",
-          studentEmail: "jane@example.com",
-          lessonTitle: "Basic Science Concepts",
-          amount: 19.99,
-          status: "pending",
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          paymentMethod: "PayPal",
-        },
-      ],
+      data: mockPayments,
     }
   },
 
@@ -440,8 +418,30 @@ export const adminAPI = {
       throw new Error("Payment ID is required")
     }
 
-    // Mock implementation
-    return { success: true, message: "Payment approved successfully" }
+    // In a real app, this would update the payment status in your backend
+    // For now, we'll simulate the approval
+    return {
+      success: true,
+      message: "Payment approved successfully",
+      paymentId: paymentId,
+      status: "approved",
+    }
+  },
+
+  rejectLessonPayment: async (paymentId, reason = "Payment verification failed") => {
+    console.log("Rejecting payment:", paymentId, "Reason:", reason)
+
+    if (!paymentId) {
+      throw new Error("Payment ID is required")
+    }
+
+    return {
+      success: true,
+      message: "Payment rejected",
+      paymentId: paymentId,
+      status: "rejected",
+      reason: reason,
+    }
   },
 
   // Dashboard Stats

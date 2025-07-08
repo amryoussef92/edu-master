@@ -21,7 +21,6 @@ export default function LessonsManagement() {
     classLevel: "",
     video: "",
     price: "",
-    scheduledDate: "",
   })
 
   const filteredLessons =
@@ -49,16 +48,6 @@ export default function LessonsManagement() {
       return
     }
 
-    // Validate scheduled date if provided
-    if (lessonForm.scheduledDate) {
-      const scheduledDate = new Date(lessonForm.scheduledDate)
-      const now = new Date()
-      if (scheduledDate <= now) {
-        alert("Scheduled date must be in the future")
-        return
-      }
-    }
-
     console.log("📚 Creating lesson with data:", lessonForm)
 
     const formData = {
@@ -67,7 +56,6 @@ export default function LessonsManagement() {
       classLevel: lessonForm.classLevel,
       video: lessonForm.video,
       price: Number(lessonForm.price) || 0,
-      scheduledDate: lessonForm.scheduledDate || null,
     }
 
     createLesson(formData, {
@@ -95,16 +83,6 @@ export default function LessonsManagement() {
       return
     }
 
-    // Validate scheduled date if provided
-    if (lessonForm.scheduledDate) {
-      const scheduledDate = new Date(lessonForm.scheduledDate)
-      const now = new Date()
-      if (scheduledDate <= now) {
-        alert("Scheduled date must be in the future")
-        return
-      }
-    }
-
     console.log("📚 Updating lesson with data:", lessonForm)
 
     const formData = {
@@ -113,7 +91,6 @@ export default function LessonsManagement() {
       classLevel: lessonForm.classLevel,
       video: lessonForm.video,
       price: Number(lessonForm.price) || 0,
-      scheduledDate: lessonForm.scheduledDate || null,
     }
 
     updateLesson(
@@ -138,20 +115,12 @@ export default function LessonsManagement() {
     console.log("✏️ Editing lesson:", lesson)
     setEditingLesson(lesson)
 
-    // Format date for input field
-    const formatDateForInput = (dateString) => {
-      if (!dateString) return ""
-      const date = new Date(dateString)
-      return date.toISOString().split("T")[0]
-    }
-
     setLessonForm({
       title: lesson.title || "",
       description: lesson.description || "",
       classLevel: lesson.classLevel || "",
       video: lesson.video || lesson.videoUrl || "",
       price: lesson.price?.toString() || "",
-      scheduledDate: formatDateForInput(lesson.scheduledDate),
     })
   }
 
@@ -162,15 +131,7 @@ export default function LessonsManagement() {
       classLevel: "",
       video: "",
       price: "",
-      scheduledDate: "",
     })
-  }
-
-  // Helper function to get minimum date (tomorrow)
-  const getMinDate = () => {
-    const tomorrow = new Date()
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    return tomorrow.toISOString().split("T")[0]
   }
 
   if (isLoading) {
@@ -402,19 +363,6 @@ export default function LessonsManagement() {
                     placeholder="0.00"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Scheduled Date <span className="text-xs text-gray-500">(optional, must be future date)</span>
-                  </label>
-                  <input
-                    type="date"
-                    min={getMinDate()}
-                    value={lessonForm.scheduledDate}
-                    onChange={(e) => setLessonForm({ ...lessonForm, scheduledDate: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
               </div>
 
               <div>
@@ -445,8 +393,8 @@ export default function LessonsManagement() {
                 <h4 className="font-medium text-yellow-900 mb-2">📝 API Requirements</h4>
                 <ul className="text-sm text-yellow-700 space-y-1">
                   <li>• Video URL is required</li>
-                  <li>• Scheduled date must be in the future (if provided)</li>
-                  <li>• Only title, description, classLevel, video, price, and scheduledDate are allowed</li>
+                  <li>• Only title, description, classLevel, video, and price are allowed</li>
+                  <li>• Price must be a valid number (0 or greater)</li>
                 </ul>
               </div>
 

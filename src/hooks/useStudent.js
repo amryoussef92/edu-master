@@ -8,6 +8,12 @@ export const useLessons = (filters = {}) => {
     queryFn: () => lessonAPI.getAll(filters),
     keepPreviousData: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    onError: (error) => {
+      console.error("Error fetching lessons:", error)
+    },
+    onSuccess: (data) => {
+      console.log("Successfully fetched lessons:", data)
+    },
   })
 }
 
