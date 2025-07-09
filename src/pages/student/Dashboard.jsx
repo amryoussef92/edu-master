@@ -1,6 +1,10 @@
+"use client"
+
+import { useNavigate } from "react-router-dom"
 import { usePurchasedLessons, useExams, useStudentStats } from "../../hooks/useStudent"
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const { data: purchasedLessons, isLoading: lessonsLoading } = usePurchasedLessons()
   const { data: exams, isLoading: examsLoading } = useExams()
   const { data: stats, isLoading: statsLoading } = useStudentStats()
@@ -122,7 +126,10 @@ export default function Dashboard() {
                   <p className="font-medium text-gray-900 mb-1">{lesson.title}</p>
                   <p className="text-sm text-gray-500">Class {lesson.classLevel}</p>
                 </div>
-                <button className="px-4 py-2 bg-purple-100 text-purple-600 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors">
+                <button
+                  onClick={() => navigate(`/student/lesson/${lesson._id}`)}
+                  className="px-4 py-2 bg-purple-100 text-purple-600 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors"
+                >
                   Continue
                 </button>
               </div>
@@ -132,7 +139,10 @@ export default function Dashboard() {
                   <span className="text-2xl">📚</span>
                 </div>
                 <p className="text-gray-500 mb-4">No lessons purchased yet</p>
-                <button className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                <button
+                  onClick={() => navigate("/student/lessons")}
+                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
                   Browse Lessons
                 </button>
               </div>
@@ -161,7 +171,10 @@ export default function Dashboard() {
                   <p className="font-medium text-gray-900 mb-1">{exam.title}</p>
                   <p className="text-sm text-gray-500">Duration: {exam.duration} minutes</p>
                 </div>
-                <button className="px-4 py-2 bg-green-100 text-green-600 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors">
+                <button
+                  onClick={() => navigate(`/student/exam/${exam._id}`)}
+                  className="px-4 py-2 bg-green-100 text-green-600 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors"
+                >
                   Start
                 </button>
               </div>

@@ -1,20 +1,19 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import axios from "axios";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
-    token: localStorage.getItem("token") || "",
+    token: localStorage.getItem('token') || '',
     user: null,
     role: null,
   });
-
   const [loading, setLoading] = useState(true); // ✅ Start as true
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (!token) {
       setLoading(false);
       return;
@@ -22,42 +21,51 @@ export const AuthProvider = ({ children }) => {
 
     const restoreSession = async () => {
       try {
-        const decoded = jwtDecode(token);
-
-        const now = Date.now() / 1000;
-        if (decoded.exp < now) {
-          throw new Error("Token expired");
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No token found');
         }
 
-        const email = decoded?.email;
-        let role = "student";
-
-        if (email === "s_admin@gmail.com") {
-          role = "super-admin";
-        } else {
-          try {
-            const adminRes = await axios.get(
-              "https://edu-master-delta.vercel.app/admin/all-user",
-              { headers: { token } }
-            );
-            if (adminRes.data.success) {
-              role = "admin";
-            }
-          } catch {
-            role = "student";
+        // عمل طلب GET للـ endpoint باستخدام الـ token
+        const response = await axios.get(
+          'https://edu-master-delta.vercel.app/user/',
+          {
+            headers: {
+              token: token,
+            },
           }
-        }
+        );
 
-        setAuth({ token, user: email, role });
-      } catch (err) {
-        console.error("❌ Failed to restore session", err);
-        localStorage.removeItem("token");
-        setAuth({ token: "", user: null, role: null });
-      } finally {
-        setLoading(false); // ✅ End loading
+        // التحقق من نجاح الطلب
+        if (response.data.success) {
+          const userRole = response.data.data.role;
+          console.log('✅ User role fetched:', userRole);
+
+          // التحقق من الـ role
+          switch (userRole) {
+            case 'user':
+              console.log('User is a regular user');
+              return { role: 'user', userData: response.data.data };
+            case 'admin':
+              console.log('User is an admin');
+              return { role: 'admin', userData: response.data.data };
+            case 'super-admin':
+              console.log('User is a super-admin');
+              return { role: 'super-admin', userData: response.data.data };
+            default:
+              console.warn('⚠️ Unknown role:', userRole);
+              return { role: 'unknown', userData: response.data.data };
+          }
+        } else {
+          throw new Error(
+            'Failed to fetch user data: ' + response.data.message
+          );
+        }
+      } catch (error) {
+        console.error('❌ Error fetching user role:', error.message);
+        return { role: null, userData: null, error: error.message };
       }
     };
-
     restoreSession();
   }, []);
 
@@ -67,38 +75,42 @@ export const AuthProvider = ({ children }) => {
       const decoded = jwtDecode(data.token);
       const email = decoded?.email;
 
-      localStorage.setItem("token", data.token);
+      if (!email) {
+        throw new Error('Invalid token: email not found');
+      }
 
-      let role = "student";
+      localStorage.setItem('token', data.token);
 
-      if (email === "s_admin@gmail.com") {
-        role = "super-admin";
+      let role = 'student';
+
+      if (email === 's_admin@gmail.com') {
+        role = 'super-admin';
       } else {
         try {
           const adminRes = await axios.get(
-            "https://edu-master-delta.vercel.app/admin/all-user",
+            'https://edu-master-delta.vercel.app/admin/all-user',
             { headers: { token: data.token } }
           );
           if (adminRes.data.success) {
-            role = "admin";
+            role = 'admin';
           }
         } catch {
-          role = "student";
+          role = 'student';
         }
       }
 
       setAuth({ token: data.token, user: email, role });
     } catch (err) {
-      console.error("Login failed:", err);
-      localStorage.removeItem("token");
+      console.error('Login failed:', err);
+      localStorage.removeItem('token');
     } finally {
       setLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    setAuth({ token: "", user: null, role: null });
+    localStorage.removeItem('token');
+    setAuth({ token: '', user: null, role: null });
   };
 
   return (
