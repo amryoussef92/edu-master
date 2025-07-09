@@ -197,7 +197,7 @@
 //                 <p className="text-sm opacity-90">Create educational content</p>
 //               </div>
 //             </button>
-            
+
 //             <button className="flex items-center justify-center p-4 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105">
 //               <span className="text-2xl mr-3">📝</span>
 //               <div className="text-left">
@@ -205,7 +205,7 @@
 //                 <p className="text-sm opacity-90">Set up assessments</p>
 //               </div>
 //             </button>
-            
+
 //             <button className="flex items-center justify-center p-4 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105">
 //               <span className="text-2xl mr-3">👥</span>
 //               <div className="text-left">
@@ -231,7 +231,7 @@
 //               </div>
 //               <span className="text-green-600 font-medium">Online</span>
 //             </div>
-            
+
 //             <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
 //               <div className="flex items-center">
 //                 <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
@@ -239,7 +239,7 @@
 //               </div>
 //               <span className="text-blue-600 font-medium">Connected</span>
 //             </div>
-            
+
 //             <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg">
 //               <div className="flex items-center">
 //                 <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
@@ -247,7 +247,7 @@
 //               </div>
 //               <span className="text-yellow-600 font-medium">75% Used</span>
 //             </div>
-            
+
 //             <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
 //               <div className="flex items-center">
 //                 <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
@@ -261,20 +261,26 @@
 //     </div>
 //   );
 // }
-"use client"
+"use client";
 
-import { useAllUsers, useAllLessons, useAllExams, useDashboardStats, usePendingPayments } from "../../hooks/useAdmin"
-import { useNavigate } from "react-router-dom"
+import {
+  useAllUsers,
+  useAllLessons,
+  useAllExams,
+  useDashboardStats,
+  usePendingPayments,
+} from "../../hooks/useAdmin";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Data fetching
-  const { data: users, isLoading: usersLoading } = useAllUsers()
-  const { data: lessons, isLoading: lessonsLoading } = useAllLessons()
-  const { data: exams, isLoading: examsLoading } = useAllExams()
-  const { data: stats, isLoading: statsLoading } = useDashboardStats()
-  const { data: pendingPayments } = usePendingPayments()
+  const { data: users, isLoading: usersLoading } = useAllUsers();
+  const { data: lessons, isLoading: lessonsLoading } = useAllLessons();
+  const { data: exams, isLoading: examsLoading } = useAllExams();
+  const { data: stats, isLoading: statsLoading } = useDashboardStats();
+  const { data: pendingPayments } = usePendingPayments();
 
   // Dashboard statistics
   const dashboardStats = [
@@ -310,7 +316,7 @@ export default function AdminDashboard() {
       change: pendingPayments?.data?.length > 0 ? "New!" : "0",
       changeType: pendingPayments?.data?.length > 0 ? "warning" : "positive",
     },
-  ]
+  ];
 
   if (usersLoading || lessonsLoading || examsLoading || statsLoading) {
     return (
@@ -320,7 +326,7 @@ export default function AdminDashboard() {
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-600 border-t-transparent absolute top-0"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -330,7 +336,9 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Welcome back, Admin! 👨‍💻</h1>
-            <p className="text-purple-100 text-lg">Manage your educational platform with ease</p>
+            <p className="text-purple-100 text-lg">
+              Manage your educational platform with ease
+            </p>
           </div>
           <div className="hidden md:block">
             <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
@@ -359,15 +367,17 @@ export default function AdminDashboard() {
                     stat.changeType === "positive"
                       ? "text-green-600 bg-green-100"
                       : stat.changeType === "warning"
-                        ? "text-orange-600 bg-orange-100"
-                        : "text-red-600 bg-red-100"
+                      ? "text-orange-600 bg-orange-100"
+                      : "text-red-600 bg-red-100"
                   }`}
                 >
                   {stat.change}
                 </div>
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</p>
+                <p className="text-2xl font-bold text-gray-900 mb-1">
+                  {stat.value}
+                </p>
                 <p className="text-sm text-gray-600">{stat.name}</p>
               </div>
             </div>
@@ -383,7 +393,7 @@ export default function AdminDashboard() {
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <button
-              onClick={() => navigate("/admin/lessons/create")}
+              onClick={() => navigate("/admin/lessons")}
               className="flex items-center justify-center p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105"
             >
               <span className="text-2xl mr-3">📚</span>
@@ -394,7 +404,7 @@ export default function AdminDashboard() {
             </button>
 
             <button
-              onClick={() => navigate("/admin/exams/create")}
+              onClick={() => navigate("/admin/exams")}
               className="flex items-center justify-center p-4 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105"
             >
               <span className="text-2xl mr-3">📝</span>
@@ -405,7 +415,7 @@ export default function AdminDashboard() {
             </button>
 
             <button
-              onClick={() => navigate("/admin/questions/create")}
+              onClick={() => navigate("/admin/questions")}
               className="flex items-center justify-center p-4 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105"
             >
               <span className="text-2xl mr-3">❓</span>
@@ -454,12 +464,16 @@ export default function AdminDashboard() {
                   <span className="text-white text-lg">👤</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900 mb-1">{user.fullName || user.email}</p>
+                  <p className="font-medium text-gray-900 mb-1">
+                    {user.fullName || user.email}
+                  </p>
                   <p className="text-sm text-gray-500">{user.email}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-gray-500">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Recently"}
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleDateString()
+                      : "Recently"}
                   </p>
                 </div>
               </div>
@@ -478,7 +492,9 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl shadow-lg">
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-900">Pending Payments</h3>
+              <h3 className="text-xl font-bold text-gray-900">
+                Pending Payments
+              </h3>
               <button
                 onClick={() => navigate("/admin/payments")}
                 className="text-sm text-green-600 font-medium hover:text-green-800"
@@ -497,11 +513,15 @@ export default function AdminDashboard() {
                   <span className="text-white text-lg">💰</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900 mb-1">{payment.studentName}</p>
+                  <p className="font-medium text-gray-900 mb-1">
+                    {payment.studentName}
+                  </p>
                   <p className="text-sm text-gray-500">{payment.lessonTitle}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-green-600">${payment.amount}</p>
+                  <p className="font-medium text-green-600">
+                    ${payment.amount}
+                  </p>
                   <p className="text-xs text-gray-500">Pending</p>
                 </div>
               </div>
@@ -559,5 +579,5 @@ export default function AdminDashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }
